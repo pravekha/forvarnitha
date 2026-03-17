@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>💛 For Varnitha</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #e8f4f3;
+      --sky-bottom: #d4ecea;
+      --water: #a8d5d8;
+      --water-deep: #7fc4c4;
+      --island-base: #8fb39e;
+      --island-top: #c2dbc2;
+      --sand: #f0e6d3;
+      --coral: #e8a598;
+      --coral-dark: #d4887a;
+      --cream: #faf7f2;
+      --slate: #5a6b6b;
+      --house-white: #f5f2ed;
+      --roof-red: #d4726a;
+      --roof-blue: #6b9dad;
+      --roof-yellow: #e8c56c;
+      --tree-dark: #4a7066;
+      --tree-light: #7ab5a0;
+      --pink: #f2c4c4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      background: var(--sky);
+    }
+
+    .game-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: linear-gradient(180deg, var(--sky) 0%, var(--sky-bottom) 50%, var(--water) 50%, var(--water-deep) 100%);
+      overflow: hidden;
+    }
+
+    /* Subtle grain texture */
+    .game-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Welcome Screen */
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    #welcome {
+      background: linear-gradient(180deg, var(--sky) 0%, var(--water) 100%);
+      text-align: center;
+      padding: 30px;
+    }
+
+    .welcome-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .welcome-title {
+      font-size: clamp(28px, 7vw, 42px);
+      font-weight: 700;
+      color: var(--slate);
+      margin-bottom: 10px;
+    }
+
+    .welcome-subtitle {
+      font-size: clamp(14px, 4vw, 18px);
+      color: var(--tree-dark);
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    .start-btn {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 15px 40px;
+      background: var(--coral);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212, 136, 122, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(212, 136, 122, 0.5);
+    }
+
+    .start-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Game Screen */
+    #gameScreen {
+      display: none;
+    }
+
+    #gameScreen.active {
+      display: block;
+    }
+
+    /* Clouds */
+    .clouds {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50px;
+      filter: blur(1px);
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50%;
+    }
+
+    .cloud-1 {
+      width: 80px; height: 30px;
+      top: 10%; left: -100px;
+      animation: cloudDrift 40s linear infinite;
+    }
+    .cloud-1::before { width: 40px; height: 40px; top: -20px; left: 15px; }
+    .cloud-1::after { width: 30px; height: 30px; top: -10px; left: 45px; }
+
+    .cloud-2 {
+      width: 100px; height: 35px;
+      top: 20%; left: -120px;
+      animation: cloudDrift 55s linear infinite;
+      animation-delay: -20s;
+    }
+    .cloud-2::before { width: 50px; height: 50px; top: -25px; left: 20px; }
+    .cloud-2::after { width: 35px; height: 35px; top: -15px; left: 60px; }
+
+    .cloud-3 {
+      width: 60px; height: 25px;
+      top: 8%; left: -80px;
+      animation: cloudDrift 45s linear infinite;
+      animation-delay: -10s;
+    }
+    .cloud-3::before { width: 30px; height: 30px; top: -15px; left: 10px; }
+    .cloud-3::after { width: 25px; height: 25px; top: -10px; left: 35px; }
+
+    @keyframes cloudDrift {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 150px)); }
+    }
+
+    /* Water ripples */
+    .water-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+    }
+
+    .ripple {
+      position: absolute;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      animation: rippleExpand 4s ease-out infinite;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: scale(0); opacity: 0.5; }
+      100% { transform: scale(3); opacity: 0; }
+    }
+
+    /* Island */
+    .island-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+    }
+
+    .island-base {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 250px;
+      height: 150px;
+    }
+
+    /* Island shadow/reflection */
+    .island-reflection {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 40px;
+      background: radial-gradient(ellipse, rgba(0,0,0,0.1) 0%, transparent 70%);
+      filter: blur(5px);
+    }
+
+    /* Placed items container */
+    .items-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Individual placed items */
+    .placed-item {
+      position: absolute;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .placed-item.placing {
+      animation: placeItem 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes placeItem {
+      0% { transform: scale(0) translateY(-50px); opacity: 0; }
+      60% { transform: scale(1.1) translateY(0); }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Floating gift */
+    .gift {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      animation: giftFloat 3s ease-in-out infinite;
+      transition: transform 0.2s;
+      z-index: 50;
+    }
+
+    .gift:hover {
+      transform: scale(1.1);
+    }
+
+    .gift:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes giftFloat {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-15px) rotate(2deg); }
+    }
+
+    .gift-box {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .gift.collected {
+      animation: giftCollect 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes giftCollect {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    /* Progress */
+    .progress-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px 20px;
+      border-radius: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 60;
+    }
+
+    .progress-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--water);
+      transition: all 0.3s;
+    }
+
+    .progress-dot.filled {
+      background: var(--coral);
+      transform: scale(1.1);
+    }
+
+    /* Notes button */
+    .notes-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.9);
+      color: var(--slate);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 60;
+      transition: all 0.3s;
+    }
+
+    .notes-btn:hover {
+      background: white;
+      transform: translateY(-2px);
+    }
+
+    /* Music button */
+    .music-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 20px;
+      padding: 10px;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 60;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Note Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(90, 107, 107, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .note-card {
+      background: var(--cream);
+      padding: 35px 30px;
+      border-radius: 20px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      position: relative;
+      animation: cardPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes cardPop {
+      0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .note-card::before {
+      content: '💌';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 36px;
+    }
+
+    .note-label {
+      font-size: 12px;
+      color: var(--tree-dark);
+      margin-bottom: 15px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .note-text {
+      font-size: clamp(18px, 5vw, 22px);
+      color: var(--slate);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .note-signature {
+      font-size: 16px;
+      color: var(--coral);
+      font-weight: 600;
+    }
+
+    .close-btn {
+      margin-top: 25px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 30px;
+      background: var(--coral);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .close-btn:hover {
+      background: var(--coral-dark);
+    }
+
+    /* Collection Screen */
+    #collection {
+      background: var(--cream);
+      overflow-y: auto;
+      padding: 30px 20px;
+    }
+
+    .collection-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .collection-header h2 {
+      font-size: 28px;
+      color: var(--slate);
+      margin-bottom: 8px;
+    }
+
+    .collection-header p {
+      font-size: 14px;
+      color: var(--tree-dark);
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      max-width: 900px;
+      margin: 0 auto 100px;
+    }
+
+    .collection-note {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .collection-note.locked {
+      background: var(--sky);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+      color: var(--water-deep);
+      font-size: 24px;
+    }
+
+    .collection-note .num {
+      font-size: 11px;
+      color: var(--tree-dark);
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .collection-note p {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+
+    .back-btn {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 30px;
+      background: var(--slate);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .completion-msg {
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .completion-msg h3 {
+      font-size: 20px;
+      color: var(--coral);
+    }
+
+    /* Birds */
+    .bird {
+      position: absolute;
+      font-size: 16px;
+      animation: birdFly 20s linear infinite;
+      opacity: 0.6;
+      z-index: 10;
+    }
+
+    @keyframes birdFly {
+      0% { transform: translateX(-30px); }
+      100% { transform: translateX(calc(100vw + 30px)); }
+    }
+
+    /* Instruction */
+    .instruction {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: var(--slate);
+      background: rgba(255,255,255,0.8);
+      padding: 10px 20px;
+      border-radius: 20px;
+      animation: pulse 2s ease-in-out infinite;
+      z-index: 60;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* Boat animation */
+    .boat {
+      position: absolute;
+      animation: boatSail 30s linear infinite;
+      z-index: 5;
+    }
+
+    @keyframes boatSail {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(100px, 20px); }
+      100% { transform: translate(0, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome Screen -->
+  <div class="screen active" id="welcome">
+    <div class="welcome-icon">🏝️</div>
+    <h1 class="welcome-title">For Varnitha</h1>
+    <p class="welcome-subtitle">build a little island of love</p>
+    <button class="start-btn" id="startBtn">Begin</button>
+  </div>
+
+  <!-- Game Screen -->
+  <div class="game-container" id="gameScreen">
+    <!-- Clouds -->
+    <div class="clouds">
+      <div class="cloud cloud-1"></div>
+      <div class="cloud cloud-2"></div>
+      <div class="cloud cloud-3"></div>
+    </div>
+
+    <!-- Birds -->
+    <div class="bird" style="top: 15%; left: -30px; animation-delay: 0s;">🕊️</div>
+    <div class="bird" style="top: 25%; left: -30px; animation-delay: -7s;">🕊️</div>
+
+    <!-- Water layer with ripples -->
+    <div class="water-layer" id="waterLayer"></div>
+
+    <!-- Island -->
+    <div class="island-container" id="islandContainer">
+      <div class="island-reflection"></div>
+      <svg class="island-base" viewBox="0 0 250 150">
+        <!-- Island base shape -->
+        <ellipse cx="125" cy="130" rx="110" ry="25" fill="#7fc4c4" opacity="0.3"/>
+        <path d="M20,100 Q30,60 80,50 Q125,30 170,50 Q220,60 230,100 Q235,130 125,140 Q15,130 20,100" fill="#8fb39e"/>
+        <path d="M30,95 Q40,65 85,55 Q125,40 165,55 Q210,65 220,95 Q222,115 125,125 Q28,115 30,95" fill="#a8c9a8"/>
+        <path d="M50,85 Q60,65 90,60 Q125,50 160,60 Q190,65 200,85 Q202,100 125,108 Q48,100 50,85" fill="#c2dbc2"/>
+        <!-- Beach area -->
+        <ellipse cx="125" cy="115" rx="70" ry="15" fill="#f0e6d3" opacity="0.5"/>
+      </svg>
+      <div class="items-container" id="itemsContainer"></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container">
+      <span class="progress-label">Island</span>
+      <div class="progress-dots" id="progressDots"></div>
+    </div>
+
+    <!-- Instruction -->
+    <div class="instruction" id="instruction">Tap the floating gifts ✨</div>
+
+    <!-- Notes button -->
+    <button class="notes-btn" id="notesBtn">💌 Notes</button>
+
+    <!-- Music button -->
+    <button class="music-btn" id="musicBtn">🎵</button>
+  </div>
+
+  <!-- Note Modal -->
+  <div class="modal" id="modal">
+    <div class="note-card">
+      <p class="note-label">A note for you</p>
+      <p class="note-text" id="noteText"></p>
+      <p class="note-signature" id="noteSignature">— P</p>
+      <button class="close-btn" id="closeBtn">Continue</button>
+    </div>
+  </div>
+
+  <!-- Collection Screen -->
+  <div class="screen" id="collection">
+    <div class="collection-header">
+      <h2>💌 Love Notes</h2>
+      <p>treasures from your island</p>
+    </div>
+    <div id="completionMsg" class="completion-msg" style="display:none;">
+      <h3>✨ Your island is complete! ✨</h3>
+    </div>
+    <div class="notes-grid" id="notesGrid"></div>
+    <button class="back-btn" id="backBtn">← Back to Island</button>
+  </div>
+
+  <!-- Lo-fi Audio -->
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const loveNotes = [
+      "Thangamae! Thank you so much! Everytime I think about washing my hands or even washing anything at all, your smile pops up inside my head.",
+      "I love you for everything you are. Even the weirdest parts of you are equally inspiring and are loved by this fat man.",
+      "Papa! I love you. You are the most special person to me in this world.",
+      "Papa! I love how tender your everything is. From your hands to your lips to your eyes to your neck! Everything. I love you.",
+      "I love you for everything that you do papa! You are my chellakuttythangakattiazhagukambilipoochikannu.",
+      "Hi papa! I love you! I wish I tell it to you more often.",
+      "Papa, the kitchen sparkles because of you — but honestly, you sparkle more.",
+      "Every clean vessel is a tiny love letter you write to us. I see them all.",
+      "You turn water and soap into magic. Our home runs on your quiet superpowers.",
+      "I know you think it's just dishes. But to me, it's you taking care of us — again and again, without asking for anything.",
+      "Sometimes I watch you from the hall and think — how did I get so lucky?",
+      "Papa, your hands do so much for this home. I hope I hold them enough.",
+      "You make the ordinary feel sacred. That's your gift.",
+      "Thank you for never making me feel bad about the mess I leave behind. You just... handle it. I notice. I love you.",
+      "One day I'll build you a kitchen so beautiful, you'll want to frame it. Until then — thank you for loving this one.",
+      "Nee illana naan enna pannuvaen papa!"
+    ];
+
+    const signatures = [
+      "— P",
+      "— ப்",
+      "— Pravekha",
+      "— your love",
+      "— P 💛",
+      "— ப்ர",
+      "— yours, P",
+      "— with love, P",
+      "— Pravekha",
+      "— your love 💛",
+      "— P",
+      "— ப்",
+      "— yours always",
+      "— Pravekha",
+      "— your love",
+      "— P 💛"
+    ];
+
+    // Island items - positioned relative to island center
+    const islandItems = [
+      { type: 'house', x: 50, y: 45, svg: `<svg viewBox="0 0 40 50" width="40" height="50"><polygon points="20,5 5,20 5,45 35,45 35,20" fill="#f5f2ed"/><polygon points="20,5 5,20 35,20" fill="#d4726a"/><rect x="15" y="30" width="10" height="15" fill="#5a6b6b"/></svg>` },
+      { type: 'tree', x: 75, y: 55, svg: `<svg viewBox="0 0 30 50" width="25" height="42"><ellipse cx="15" cy="15" rx="12" ry="18" fill="#4a7066"/><rect x="13" y="30" width="4" height="15" fill="#8d6e63"/></svg>` },
+      { type: 'house', x: 55, y: 70, svg: `<svg viewBox="0 0 35 45" width="32" height="40"><polygon points="17,5 3,18 3,40 32,40 32,18" fill="#f5f2ed"/><polygon points="17,5 3,18 32,18" fill="#6b9dad"/><rect x="13" y="26" width="8" height="14" fill="#5a6b6b"/></svg>` },
+      { type: 'tree', x: 30, y: 50, svg: `<svg viewBox="0 0 25 45" width="22" height="38"><ellipse cx="12" cy="12" rx="10" ry="15" fill="#7ab5a0"/><rect x="10" y="25" width="4" height="12" fill="#8d6e63"/></svg>` },
+      { type: 'flower', x: 40, y: 80, svg: `<svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="8" r="5" fill="#f2c4c4"/><circle cx="10" cy="8" r="2" fill="#e8c56c"/><rect x="9" y="12" width="2" height="6" fill="#7ab5a0"/></svg>` },
+      { type: 'house', x: 65, y: 40, svg: `<svg viewBox="0 0 30 40" width="28" height="36"><polygon points="15,5 3,15 3,35 27,35 27,15" fill="#f5f2ed"/><polygon points="15,5 3,15 27,15" fill="#e8c56c"/><rect x="11" y="22" width="7" height="13" fill="#5a6b6b"/></svg>` },
+      { type: 'tree', x: 25, y: 65, svg: `<svg viewBox="0 0 28 48" width="24" height="40"><ellipse cx="14" cy="14" rx="11" ry="16" fill="#4a7066"/><rect x="12" y="28" width="4" height="14" fill="#8d6e63"/></svg>` },
+      { type: 'flower', x: 70, y: 75, svg: `<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="8" r="4" fill="#e8a598"/><circle cx="10" cy="8" r="1.5" fill="#f0e6d3"/><rect x="9" y="11" width="2" height="5" fill="#7ab5a0"/></svg>` },
+      { type: 'boat', x: 10, y: 95, svg: `<svg viewBox="0 0 40 25" width="35" height="22"><path d="M5,15 Q20,20 35,15 L32,8 L8,8 Z" fill="#f5f2ed"/><polygon points="20,2 20,12 25,12" fill="#e8a598"/><line x1="20" y1="2" x2="20" y2="15" stroke="#8d6e63" stroke-width="1.5"/></svg>` },
+      { type: 'tree', x: 80, y: 60, svg: `<svg viewBox="0 0 22 40" width="20" height="35"><ellipse cx="11" cy="10" rx="9" ry="12" fill="#7ab5a0"/><rect x="9" y="20" width="4" height="10" fill="#8d6e63"/></svg>` },
+      { type: 'flower', x: 35, y: 60, svg: `<svg viewBox="0 0 18 18" width="15" height="15"><circle cx="9" cy="7" r="4" fill="#dda0dd"/><circle cx="9" cy="7" r="1.5" fill="#f0e6d3"/><rect x="8" y="10" width="2" height="5" fill="#7ab5a0"/></svg>` },
+      { type: 'house', x: 45, y: 55, svg: `<svg viewBox="0 0 32 42" width="30" height="38"><polygon points="16,5 3,16 3,38 29,38 29,16" fill="#f5f2ed"/><polygon points="16,5 3,16 29,16" fill="#d4726a"/><rect x="12" y="24" width="8" height="14" fill="#5a6b6b"/><rect x="6" y="20" width="5" height="5" fill="#a8d5d8" opacity="0.5"/></svg>` },
+      { type: 'bird', x: 60, y: 25, svg: `<svg viewBox="0 0 20 15" width="18" height="13"><path d="M2,8 Q5,5 10,7 Q15,5 18,8" fill="none" stroke="#5a6b6b" stroke-width="1.5"/></svg>` },
+      { type: 'tree', x: 55, y: 35, svg: `<svg viewBox="0 0 20 35" width="18" height="30"><ellipse cx="10" cy="10" rx="8" ry="11" fill="#4a7066"/><rect x="8" y="19" width="4" height="10" fill="#8d6e63"/></svg>` },
+      { type: 'flower', x: 75, y: 70, svg: `<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="6" r="3.5" fill="#a8d5d8"/><circle cx="8" cy="6" r="1.5" fill="#e8c56c"/><rect x="7" y="9" width="2" height="4" fill="#7ab5a0"/></svg>` },
+      { type: 'flag', x: 50, y: 30, svg: `<svg viewBox="0 0 25 40" width="20" height="35"><rect x="11" y="5" width="2" height="30" fill="#8d6e63"/><polygon points="13,5 13,18 25,11" fill="#e8a598"/></svg>` }
+    ];
+
+    // Gift SVG
+    const giftSVG = `<svg viewBox="0 0 50 50" width="50" height="50">
+      <rect x="8" y="20" width="34" height="25" rx="3" fill="#f2c4c4"/>
+      <rect x="8" y="20" width="34" height="8" fill="#e8a598"/>
+      <rect x="22" y="20" width="6" height="25" fill="#e8a598"/>
+      <path d="M25,20 Q15,10 20,5 Q25,0 25,10" fill="none" stroke="#e8a598" stroke-width="3"/>
+      <path d="M25,20 Q35,10 30,5 Q25,0 25,10" fill="none" stroke="#e8a598" stroke-width="3"/>
+      <circle cx="25" cy="20" r="4" fill="#e8c56c"/>
+    </svg>`;
+
+    let unlockedNotes = JSON.parse(localStorage.getItem('loveIsland_unlocked') || '[]');
+    let currentGift = null;
+    let musicPlaying = false;
+    const bgMusic = document.getElementById('bgMusic');
+    bgMusic.volume = 0.3;
+
+    // Initialize progress dots
+    function initProgress() {
+      const container = document.getElementById('progressDots');
+      container.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot' + (unlockedNotes.includes(i) ? ' filled' : '');
+        container.appendChild(dot);
+      }
+    }
+
+    // Create water ripples
+    function createRipples() {
+      const water = document.getElementById('waterLayer');
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const ripple = document.createElement('div');
+          ripple.className = 'ripple';
+          ripple.style.left = (Math.random() * 80 + 10) + '%';
+          ripple.style.top = (Math.random() * 60 + 20) + '%';
+          ripple.style.width = '40px';
+          ripple.style.height = '40px';
+          water.appendChild(ripple);
+          setTimeout(() => ripple.remove(), 4000);
+        }, i * 800);
+      }
+    }
+
+    // Render placed items
+    function renderPlacedItems() {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+      
+      unlockedNotes.forEach((noteIndex) => {
+        if (noteIndex < islandItems.length) {
+          const item = islandItems[noteIndex];
+          const div = document.createElement('div');
+          div.className = 'placed-item';
+          div.style.left = item.x + '%';
+          div.style.top = item.y + '%';
+          div.style.transform = 'translate(-50%, -50%)';
+          div.innerHTML = item.svg;
+          div.addEventListener('click', () => showNote(noteIndex));
+          container.appendChild(div);
+        }
+      });
+    }
+
+    // Spawn floating gift
+    function spawnGift() {
+      if (currentGift || unlockedNotes.length >= 16) {
+        if (unlockedNotes.length >= 16) {
+          document.getElementById('instruction').textContent = 'Your island is complete! 💛';
+        }
+        return;
+      }
+
+      // Find next unplaced item
+      let nextIndex = -1;
+      for (let i = 0; i < 16; i++) {
+        if (!unlockedNotes.includes(i)) {
+          nextIndex = i;
+          break;
+        }
+      }
+
+      if (nextIndex === -1) return;
+
+      const gift = document.createElement('div');
+      gift.className = 'gift';
+      gift.dataset.index = nextIndex;
+      gift.innerHTML = giftSVG;
+
+      // Random position in sky area
+      const x = Math.random() * 60 + 20;
+      const y = Math.random() * 25 + 10;
+      gift.style.left = x + '%';
+      gift.style.top = y + '%';
+
+      gift.addEventListener('click', () => collectGift(gift, nextIndex));
+
+      document.getElementById('gameScreen').appendChild(gift);
+      currentGift = gift;
+    }
+
+    // Collect gift
+    function collectGift(gift, index) {
+      gift.classList.add('collected');
+      currentGift = null;
+
+      // Add item to island
+      unlockedNotes.push(index);
+      localStorage.setItem('loveIsland_unlocked', JSON.stringify(unlockedNotes));
+
+      // Place item with animation
+      setTimeout(() => {
+        gift.remove();
+        placeNewItem(index);
+        updateProgress();
+        showNote(index);
+      }, 400);
+    }
+
+    // Place new item on island
+    function placeNewItem(index) {
+      const container = document.getElementById('itemsContainer');
+      const item = islandItems[index];
+
+      const div = document.createElement('div');
+      div.className = 'placed-item placing';
+      div.style.left = item.x + '%';
+      div.style.top = item.y + '%';
+      div.style.transform = 'translate(-50%, -50%)';
+      div.innerHTML = item.svg;
+      div.addEventListener('click', () => showNote(index));
+      container.appendChild(div);
+
+      setTimeout(() => div.classList.remove('placing'), 600);
+    }
+
+    // Update progress
+    function updateProgress() {
+      const dots = document.querySelectorAll('.progress-dot');
+      unlockedNotes.forEach(index => {
+        if (dots[index]) dots[index].classList.add('filled');
+      });
+
+      if (unlockedNotes.length >= 16) {
+        document.getElementById('instruction').textContent = 'Your island is complete! 💛';
+      }
+    }
+
+    // Show note
+    function showNote(index) {
+      document.getElementById('noteText').textContent = loveNotes[index];
+      document.getElementById('noteSignature').textContent = signatures[index];
+      document.getElementById('modal').classList.add('active');
+    }
+
+    // Show collection
+    function showCollection() {
+      const grid = document.getElementById('notesGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < 16; i++) {
+        const card = document.createElement('div');
+        if (unlockedNotes.includes(i)) {
+          card.className = 'collection-note';
+          card.innerHTML = `<div class="num">NOTE ${i + 1}</div><p>${loveNotes[i]}</p>`;
+        } else {
+          card.className = 'collection-note locked';
+          card.textContent = '🎁';
+        }
+        grid.appendChild(card);
+      }
+
+      document.getElementById('completionMsg').style.display = unlockedNotes.length >= 16 ? 'block' : 'none';
+      document.getElementById('collection').classList.add('active');
+      document.getElementById('gameScreen').classList.remove('active');
+    }
+
+    // Events
+    document.getElementById('startBtn').addEventListener('click', () => {
+      document.getElementById('welcome').classList.remove('active');
+      document.getElementById('gameScreen').classList.add('active');
+      
+      initProgress();
+      renderPlacedItems();
+      createRipples();
+      setInterval(createRipples, 3000);
+      
+      // Start spawning gifts
+      setTimeout(spawnGift, 1000);
+      setInterval(() => {
+        if (!currentGift) spawnGift();
+      }, 2000);
+
+      // Try to play music
+      bgMusic.play().catch(() => {});
+      musicPlaying = true;
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      document.getElementById('modal').classList.remove('active');
+      // Spawn next gift after closing note
+      setTimeout(spawnGift, 500);
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') {
+        document.getElementById('modal').classList.remove('active');
+        setTimeout(spawnGift, 500);
+      }
+    });
+
+    document.getElementById('notesBtn').addEventListener('click', showCollection);
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      document.getElementById('collection').classList.remove('active');
+      document.getElementById('gameScreen').classList.add('active');
+    });
+
+    document.getElementById('musicBtn').addEventListener('click', () => {
+      if (musicPlaying) {
+        bgMusic.pause();
+        musicPlaying = false;
+        document.getElementById('musicBtn').textContent = '🔇';
+      } else {
+        bgMusic.play().catch(() => {});
+        musicPlaying = true;
+        document.getElementById('musicBtn').textContent = '🎵';
+      }
+    });
+  </script>
+</body>
+</html>
